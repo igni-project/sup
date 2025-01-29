@@ -1,6 +1,6 @@
 # Scene Update Protocol
 
-SUP/1.0, Draft 1
+SUP/1.0, Draft 2
 November 2024, Igni Project
 
 This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.
@@ -36,7 +36,7 @@ Despite the contents of this document being subject to change, the protocol itse
 
 The Scene Update Protocol (SUP) is an application layer communication protocol that is lightweight and extensible enough to transfer modern 3D graphics over a network. This protocol requires a bi-directional client-to-server network connection to operate.
 
-Nearing the end of the development of VSUP, it quickly became evident that the protocol had a wider range of use than simply visual graphics. To better reflect its nature, VSUP is now known as SUP: the Scene Update Protocol. This rebrand was performed by first discontinuing VSUP. At the same time, the new SUP standard was created, forked from the first and only draft of VSUP. Because this is not VSUP but a newly created standard, an opportunity has opened to make changes to the protocol.
+Nearing the end of the development of the Visual Scene Update Protocol (VSUP), it quickly became evident that the protocol had a wider range of use than simply visual graphics. To better reflect its nature, VSUP is now known as SUP: the Scene Update Protocol. This rebrand was performed by first discontinuing VSUP. At the same time, the new SUP standard was created, forked from the first and only draft of VSUP. Because this is not VSUP but a newly created standard, an opportunity has opened to make changes to the protocol.
 
 The new protocol features:
 
@@ -173,6 +173,9 @@ The ‘Import Asset’ request shall fail if:
 
 **File import failed**
 -   The server fails to import the asset file.
+
+**ID already taken**
+-   An asset of ID **Asset ID** already exists in the clients scene.
 
 ### 6.3. Show Asset
 
