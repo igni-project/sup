@@ -1,7 +1,7 @@
 # Scene Update Protocol
 
 SUP/1.0, Draft 2
-November 2024, Igni Project
+January 2025, Igni Project
 
 This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.
 
