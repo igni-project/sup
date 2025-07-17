@@ -1,6 +1,6 @@
 # Scene Update Protocol
 
-SUP/1.0, Draft 1 
+SUP/1.0, Draft 1 Revision 1
 March 2025, Igni Project
 
 This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.
@@ -15,7 +15,7 @@ This document is an informal draft. It may not be entirely unambiguous, grammati
 4. Requests
 	1. Request Header
 	2. Configure Connection
-	3. Load Model
+	3. Import Model
 	4. Show Model
 	5. Hide Model
 	6. Transform Model
