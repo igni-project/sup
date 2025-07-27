@@ -112,7 +112,7 @@ The ‘Configure Connection’ request shall fail if:
 | 4               | 32-bit int        | Model ID        |
 | 1+              | File path or URL  | Model path      |
 
-The ‘Import Model’ request shall instruct the server to import an model from a file. If the file specified by **Model path** is a shortcut, then the file loaded shall be that which the shortcut or chain of shortcuts point to. Files of the same base name as **Model path** shall be imported and bound to the loaded model automatically.
+The ‘Import Model’ request shall instruct the server to import a model from a file. If the file specified by **Model path** is a shortcut, then the file loaded shall be that which the shortcut or chain of shortcuts point to. Files of the same base name as **Model path** shall be imported and bound to the loaded model automatically.
 
 The model created by the request must have the same ID number as **Model ID**. Upon creation, the model shall be hidden. Its initial location and rotation coordinates shall be 0 on all axes. Scale, however shall start out at 1 on model load.
 
@@ -126,7 +126,7 @@ The ‘Import Model’ request shall fail if:
 -   The server fails to import the model file.
 
 **ID already taken**
--   An model of ID **Model ID** already exists in the clients scene.
+-   A model of ID **Model ID** already exists in the clients scene.
 
 ### 4.4. Show Model
 
