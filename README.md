@@ -1,6 +1,6 @@
 # Scene Update Protocol
 
-SUP/1.0, Draft 1 Revision 1
+SUP/1.0, Draft 1 Revision 2
 March 2025, Igni Project
 
 This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.
@@ -204,7 +204,7 @@ The ‘Destroy Model’ request shall fail if:
 | 1               | 6           | Opcode          |
 | 4               | 32-bit int  | Model ID        |
 | 4               | 32-bit int  | Action ID       |
-| 4               | string      | Action name     |
+| 1+              | string      | Action name     |
 
 Models may contain a set of animation sequences called actions. These sequences may animate all properties of a model, including those adjustable through requests.
 
