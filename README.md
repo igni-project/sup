@@ -1,6 +1,6 @@
 # Scene Update Protocol
 
-SUP/1.0, Draft 1 Revision 2
+SUP/1.0, Draft 1 Revision 3
 March 2025, Igni Project
 
 This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.
@@ -27,13 +27,12 @@ This document is an informal draft. It may not be entirely unambiguous, grammati
 	12. Transform Viewpoint
 	13. Set Viewpoint Field of View 
 5. Response
-	1. Response Header
-	2. Invalid Protocol Version 
-	3. Model Not Found		  
-	4. Action Not Found		 
-	5. Model Import Failed	  
-	6. Identifier Already Taken		 
-	7. Invalid Request Code	
+	1. Invalid Protocol Version 
+	2. Model Not Found		  
+	3. Action Not Found		 
+	4. Model Import Failed	  
+	5. Identifier Already Taken		 
+	6. Invalid Request Code	
 6. Authors Notes
 
 ## 1. Introduction
@@ -320,33 +319,27 @@ Each error has a unique identifier. Error responses may use the following error 
 | 4     | ID already taken         |
 | 5     | Invalid opcode           |
 
-### 5.1. Response Header
-
-| **Size (bytes)**| **Value**   | **Description** |
-|-----------------|-------------|-----------------|
-| 1               | 8-bit int   | Response code   |
-
-### 5.2. Invalid Protocol Version
+### 5.1. Invalid Protocol Version
 
 If a client attempts to select an unsupported SUP version when configuring its connection, the client shall receive this error. The ‘invalid protocol version’ error is identified by an error code of 0 and is fatal.
 
-### 5.3. File Not Found
+### 5.2. File Not Found
 
 This error signals to a client that a path does not point to a valid file. It has an error code of 1 and is not fatal.
 
-### 5.4. Action Not Found
+### 5.3. Action Not Found
 
 An 'action not found' error. This error has a code of 2.
 
-### 5.5. Model Import Failed
+### 5.4. Model Import Failed
 
 This error has a code of 3.
 
-### 5.6. Identifier Already Taken
+### 5.5. Identifier Already Taken
 
 This error has a code of 4.
 
-### 5.7. Invalid Request Code
+### 5.6. Invalid Request Code
 
 This error has a code of 5.
 

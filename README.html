@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+
+<h1>Scene Update Protocol</h1>
+
+<p>SUP/1.0, Draft 1 Revision 3</p>
+<p>March 2025, Igni Project</p>
+
+<p>This document is an informal draft. It may not be entirely unambiguous, grammatically correct or consistent. The document, as it stands, merely exists to assist development of a more refined document later on.</p>
+
+<h2>Table of Contents</h2>
+<ol>
+	<li>
+		<a href="#sup-introduction">Introduction</a>
+	</li>
+	<li>
+		<a href="#sup-definitions-and-abbreviations">Definitions and Abbreviations</a>
+	</li>
+	<li>
+		<a href="#sup-data-formats">Data Formats</a>
+	</li>
+	<ol>
+		<li>
+			<a href="#sup-data-formats-string">String</a>
+		</li>
+		<li>
+			<a href="#sup-data-formats-file-path">File Path</a>
+		</li>
+		<li>
+			<a href="#sup-data-formats-url">URL</a>
+		</li>
+	</ol>
+	<li>
+		<a href="#sup-requests">Requests</a>
+	</li>
+	<ol>
+		<li>
+			<a href="#sup-requests-request-header">Request Header</a>
+		</li>
+		<li>
+			<a href="#sup-requests-configure-connection">Configure Connection</a>
+		</li>
+		<li>
+			<a href="#sup-requests-import-model">Import Model</a>
+		</li>
+		<li>
+			<a href="#sup-requests-show-model">Show Model</a>
+		</li>
+		<li>
+			<a href="#sup-requests-hide-model">Hide Model</a>
+		</li>
+		<li>
+			<a href="#sup-requests-transform-model">Transform Model</a>
+		</li>
+		<li>
+			<a href="#sup-requests-destroy-model">Destroy Model</a>
+		</li>
+		<li>
+			<a href="#sup-requests-create-action-instance">Create Action Instance</a>
+		</li>
+		<li>
+			<a href="#sup-requests-set-action-frame">Set Action Frame</a>
+		</li>
+		<li>
+			<a href="#sup-requests-set-action-weight">Set Action Weight</a>
+		</li>
+		<li>
+			<a href="#sup-requests-destroy-action-instance">Destroy Action Instance</a>
+		</li>
+		<li>
+			<a href="#sup-requests-transform-viewpoint">Transform Viewpoint</a>
+		</li>
+		<li>
+			<a href="#sup-requests-set-viewpoint-field-of-view">Set Viewpoint Field of View</a>
+		</li>
+	</ol>
+	<li>
+		<a href="#sup-response">Response</a>
+	</li>
+	<ol>
+		<li>
+			<a href="#sup-response-invalid-protocol-version">Invalid Protocol Version</a>
+		</li>
+		<li>
+			<a href="#sup-response-model-not-found">Model Not Found</a>
+		</li>
+		<li>
+			<a href="#sup-response-action-not-found">Action Not Found</a>
+		</li>
+		<li>
+			<a href="#sup-response-model-import-failed">Model Import Failed</a>
+		</li>
+		<li>
+			<a href="#sup-response-identifier-already-taken">Identifier Already Taken</a>
+		</li>
+		<li>
+			<a href="#sup-response-invalid-request-code">Invalid Request Code</a>
+		</li>
+	</ol>
+	<li>
+		<a href="#sup-authors-notes">Authors Notes</a>
+	</li>
+</ol>
+
+<h2 id="sup-introduction">1. Introduction</h2>
+
+<p>The Scene Update Protocol (SUP) is an application layer communication protocol capable of transferring real-time 3D graphics over a network. Its use of actions and model file loading grants it great extendability and versatility while remaining lightweight and simple in design.</p>
+
+<h2 id="sup-definitions-and-abbreviations">2. Definitions and Abbreviations</h2>
+
+<dl>
+	<dt>
+		<b>3D</b>
+	</dt>
+	<dd>3-dimensional</dd>
+
+	<dt>
+		<b>field</b>
+	</dt>
+	<dd>variable in a data structure</dd>
+
+	<dt>
+		<b>float</b>
+	</dt>
+	<dd>IEEE 754 floating-point integer</dd>
+
+	<dt>
+		<b>ID</b>
+	</dt>
+	<dd>unique identifier</dd>
+
+	<dt>
+		<b>int</b>
+	</dt>
+	<dd>signed integer</dd>
+
+	<dt>
+		<b>uint</b>
+	</dt>
+	<dd>unsigned integer</dd>
+</dl>
+
+<h2 id="sup-data-formats">3. Data Formats</h2>
+
+<h3 id="sup-data-formats-string" >3.1. String</h3>
+
+<p>The term ‘string’ in this document specifically refers to a null-terminated string in UTF8 (RFC [3629](https://datatracker.ietf.org/doc/html/rfc3629)) format.</p>
+
+<h3 id="sup-data-formats-file-path">3.2. File Path</h3>
+
+<p>The term ‘file path’ in this document specifically refers to a string that points to a file. Format of file paths may vary implementation to implementation.</p>
+
+<h3 id="sup-data-formats-url">3.3. URL</h3>
+
+<p>The term 'URL' is an acronym for Uniform Resource Locator. URLs shall be interpreted in accordance with the URL Standard by WHATWG ([link](https://url.spec.whatwg.org/)).</p>
+
+<h2 id="sup-requests">4. Requests</h2>
+
+<p>The term 'request' in this specification is defined as a message sent from a client to a server. Requests contain instructions, which when read by a server, are carried out by the server on the clients behalf.</p>
+
+<h3 id="sup-requests-request-header">4.1. Request Header</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>8-bit int</td>
+		<td>Request code</td>
+	</tr>
+</table>
+
+<p>Every request has its contents preceded by a header. The header has 1 field: an 8-bit code that identifies the request placed after the header.</p>
+
+<h3 id="sup-requests-configure-connection">4.2. Configure Connection</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>0</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>0</td>
+		<td>Version ID</td>
+	</tr>
+</table>
+
+<p>The ‘Configure Connection’ request provides a server with details on the connection of the client that sent the message. </p>
+
+<p>This request is comprised of 1 field: the version of protocol adhered to by the sender. To inform the server that version 1.0 of the SUP protocol is in use, this field shall be set to 0.</p>
+
+<h4>Errors</h4>
+<p>The ‘Configure Connection’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Invalid protocol version</b>
+	</dt>
+	<dd>
+		<b>Version ID</b> does not identify an existing version of the SUP protocol.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-import-model">4.3. Import Model</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>1</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+	<tr>
+		<td>1+</td>
+		<td>File path or URL</td>
+		<td>Model path</td>
+	</tr>
+</table>
+
+<p>The ‘Import Model’ request shall instruct the server to import a model from a file. If the file specified by <b>Model path</b> is a shortcut, then the file loaded shall be that which the shortcut or chain of shortcuts point to. Files of the same base name as <b>Model path</b> shall be imported and bound to the loaded model automatically.</p>
+
+<p>The model created by the request must have the same ID number as <b>Model ID</b>. Upon creation, the model shall be hidden. Its initial location and rotation coordinates shall be 0 on all axes. Scale, however shall start out at 1 on model load.</p>
+
+<p>This request consists of 2 fields. The first field is 32-bit identification code of the newly created model. The second field directly follows the first and is the model path as a null-terminated UTF-8 string.</p>
+
+<h4>Errors</h4>
+<p>The ‘Import Model’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>File import failed</b>
+	<dd>
+		The server fails to import the model file.
+	</dd>
+	<dt>
+		<b>ID already taken</b>
+	</dt>
+	<dd>
+		A model of ID <b>Model ID</b> already exists in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-show-model">4.4. Show Model</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>2</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+</table>
+
+<p>The ‘Show Model’ request shall make the model specified by <b>Model ID</b> visible to the viewer.</p>
+
+<h4>Errors</h4>
+<p>The ‘Show Model’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Model not found</b>
+	</dt>
+	<dd>
+		<b>Model ID</b> does not match the ID of any model in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-hide-model">4.5. Hide Model</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>3</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+</table>
+
+<p>This request shall hide the model identified by <b>Model ID</b>. A model which is hidden shall not be displayed onscreen.</p>
+
+<h4>Errors</h4>
+<p>The ‘Hide Model’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Model not found</b>
+	</dt>
+	<dd>
+		<b>Model ID</b> does not match the ID of any model in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-transform-model">4.6. Transform Model</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>4</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>X location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Y location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Z location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>X rotation</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Y rotation</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Z rotation</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>X scale</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Y scale</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Z scale</td>
+	</tr>
+</table>
+
+<p>The ‘Transform Model’ request shall set the location, rotation and scale of the model referenced by <b>Model ID</b>. The X, Y and Z location, rotation and scale coordinates of the selected model are to be copied from the request.</p>
+
+<h4>Errors</h4>
+<p>The ‘Transform Model’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Model not found</b>
+	</dt>
+	<dd>
+		<b>Model ID</b> does not match the ID of any model in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-destroy-model">4.7. Destroy Model</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>5</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+</table>
+
+<p>This request shall remove the model specified by <b>Model ID</b> from its scene.</p>
+
+<h4>Errors</h4>
+<p>The ‘Destroy Model’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Model not found</b>
+	</dt>
+	<dd>
+		<b>Model ID</b> does not match the ID of any model in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-create-action-instance">4.8. Create Action Instance</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>6</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Model ID</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Action ID</td>
+	</tr>
+	<tr>
+		<td>1+</td>
+		<td>string</td>
+		<td>Action name</td>
+	</tr>
+</table>
+
+<p>Models may contain a set of animation sequences called actions. These sequences may animate all properties of a model, including those adjustable through requests.</p>
+
+<p>This request shall create a reference to an action of the same name as <b>Action name</b> in the model specified by <b>Model ID</b>. Upon creation, the action instance shall have its scale set to 0. More information on action scaling and blending is available in section <b>6.9. Set Action Weight</b>.</p>
+
+<h4>Errors</h4>
+<p>The ‘Create Action Instance’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Model not found</b>
+	</dt>
+	<dd>
+		<b>Model ID</b> does not match the ID of any model in the clients scene.
+	</dd>
+	<dt>
+		<b>Action not found</b>
+	</dt>
+	<dd>
+		The model specified by <b>Model ID</b> has no action whose name matches the string provided by <b>Action name</b>.
+	</dd>
+	<dt>
+		<b>ID already taken</b>
+	</dt>
+	<dd>
+		An action of ID <b>Action ID</b> already exists in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-set-action-frame">4.9. Set Action Frame</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>7</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Action ID</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Frame index</td>
+	</tr>
+</table>
+
+<p>The ‘Set Action Frame’ request shall set the current frame of an action. The action to have its frame number set must be identified by same ID as <b>Action ID</b>. The <b>Frame index</b> field shall specify the frame which the selected action shall skip to.</p>
+
+<h4>Errors</h4>
+<p>The ‘Set Action Frame’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Action not found</b>
+	</dt>
+	<dd>
+		<b>Action ID</b> does not match the ID of any action in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-set-action-weight">4.10. Set Action Weight</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>8</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Action ID</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Weight</td>
+	</tr>
+</table>
+
+<p>The ‘Set Action Weight’ request shall adjust the blend weight of an action. The action identified by <b>Action ID</b> shall have its blend weight set to the value of the <b>Weight</b> field.</p>
+
+<h4>Errors</h4>
+<p>The ‘Set Action Weight’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Action not found</b>
+	</dt>
+	<dd>
+		<b>Action ID</b> does not match the ID of any action in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-destroy-action-instance">4.11. Destroy Action Instance</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>9</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>32-bit int</td>
+		<td>Action ID</td>
+	</tr>
+</table>
+
+<p>The ‘Destroy Action Instance’ request shall remove the action instance identified by <b>Action ID</b> from its scene.</p>
+
+<h4>Errors</h4>
+<p>The ‘Destroy Action Instance’ request shall fail if:</p>
+
+<dl>
+	<dt>
+		<b>Action not found</b>
+	</dt>
+	<dd>
+		<b>Action ID</b> does not match the ID of any action in the clients scene.
+	</dd>
+</dl>
+
+<h3 id="sup-requests-transform-viewpoint">4.12. Transform Viewpoint</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>10</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>X location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Y location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Z location</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>X rotation</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Y rotation</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Z rotation</td>
+	</tr>
+</table>
+
+<p>The ‘Transform Viewpoint’ request shall set the location and rotation of the viewpoint. The command shall set the X, Y and Z location and rotation coordinates of the world viewpoint to those specified by the request.</p>
+
+<h4>Errors</h4>
+<p>The ‘Transform Viewpoint’ request has no errors.</p>
+
+<h3 id="sup-requests-set-viewpoint-field-of-view">4.13. Set Viewpoint Field of View</h3>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>11</td>
+		<td>Opcode</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>float</td>
+		<td>Field of view</td>
+	</tr>
+</table>
+
+<p>The ‘Set Viewpoint Field of View’ request shall set the angular extent of the viewpoints perspective. The field of view of the viewpoint shall be set to the value of <b>Field of view</b>.</p>
+
+<h4>Errors</h4>
+<p>The ‘Set Viewpoint Field of View’ request has no errors.</p>
+
+<h2 id="sup-response">5. Response</h2>
+
+<p>Upon a failed request, an error response shall be sent to the sender of the unsuccessful request. Errors may be fatal or non-fatal.</p>
+
+<table>
+	<tr>
+		<th>Size (bytes)</th>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>8-bit int</td>
+		<td>Error code</td>
+	</tr>
+</table>
+
+<p>Error responses shall be comprised of 2 fields. The first field, <b>Request opcode</b>, shall hold the opcode of the command which caused the error. <b>Error code</b>, the second field, shall contain the correct identifier of the error which has occurred.</p>
+
+<p>Each error has a unique identifier. Error responses may use the following error codes:</p>
+
+<table>
+	<tr>
+		<th>Value</th>
+		<th>Description</th>
+	</tr>
+		<td>0</td>
+		<td>Invalid protocol version</td>
+	<tr>
+		<td>1</td>
+		<td>Model not found</td>
+	</tr>
+	<tr>
+		<td>2</td>
+		<td>Action not found</td>
+	</tr>
+	<tr>
+		<td>3</td>
+		<td>Model import failed</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>ID already taken</td>
+	</tr>
+	<tr>
+		<td>5</td>
+		<td>Invalid opcode</td>
+	</tr>
+</table>
+
+<h3 id="sup-response-invalid-protocol-version">5.1. Invalid Protocol Version</h3>
+
+<p>If a client attempts to select an unsupported SUP version when configuring its connection, the client shall receive this error. The ‘invalid protocol version’ error is identified by an error code of 0 and is fatal.</p>
+
+<h3 id="sup-response-file-not-found">5.2. File Not Found</h3>
+
+<p>This error signals to a client that a path does not point to a valid file. It has an error code of 1 and is not fatal.</p>
+
+<h3 id="sup-response-action-not-found">5.3. Action Not Found</h3>
+
+<p>An 'action not found' error. This error has a code of 2.</p>
+
+<h3 id="sup-response-model-import-failed">5.4. Model Import Failed</h3>
+
+<p>This error has a code of 3.</p>
+
+<h3 id="sup-response-identifier-already-taken">5.5. Identifier Already Taken</h3>
+
+<p>This error has a code of 4.</p>
+
+<h3 id="sup-response-invalid-request-code">5.6. Invalid Request Code</h3>
+
+<p>This error has a code of 5.</p>
+
+<h2 id="sup-authors-notes">6. Authors Notes</h2>
+
+
