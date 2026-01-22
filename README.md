@@ -1,6 +1,6 @@
 # Scene Update Protocol
 
-SUP/1.0, Draft 1 Revision 3
+SUP/1.0, Draft 1 Revision 4
 March 2025, Igni Project
 
 
